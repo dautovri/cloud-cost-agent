@@ -15,7 +15,17 @@ It's a Claude Code plugin — install it from the marketplace:
 
 The `cloud-cost-agent` skill is then available automatically whenever you talk about cloud cost.
 
-### Other agents (Cursor, Gemini CLI, Grok)
+### Any agent via `npx skills` (Cursor, Codex, Gemini, Copilot + 70 more)
+
+Installs the skill into whichever agent you point it at — works with the [skills.sh](https://skills.sh) ecosystem:
+
+```bash
+npx skills add dautovri/cloud-cost-agent --agent claude-code
+```
+
+Run `npx skills find "cloud cost"` to discover it in the directory.
+
+### Or the bundled installer
 
 One command — auto-detects your agent and copies the skill into place:
 
