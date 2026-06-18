@@ -1,215 +1,235 @@
 ---
 name: cloud-cost-agent
-description: AWS-native cost optimization and savings using only official AWS services (Cost Explorer, Compute Optimizer, Cost Optimization Hub, CUR). Use when the user wants to analyze AWS spend, find savings opportunities, run a cost audit, get rightsizing recommendations, Savings Plans advice, or generate actionable optimization reports with Grok or Claude.
-when-to-use: Analyze AWS bill, find waste, rightsizing, idle resources, savings plans, cost optimization audit, quick wins on AWS spend.
+description: Multi-cloud cost optimization and savings agent for the top 3 providers (AWS, Google Cloud, Azure). Uses only native CLI tools and recommendation services (Cost Explorer/Compute Optimizer, GCP Recommender, Azure Advisor + Cost Management). Use for analyzing spend, finding rightsizing opportunities, idle resources, commitment recommendations, and generating prioritized savings reports.
+when-to-use: Analyze cloud spend, cost audit, find savings, rightsizing, idle resources across AWS/GCP/Azure. Support for provider-specific or cross-cloud queries.
 allowed-tools: Bash
-compatibility: Requires AWS CLI v2 configured with read access to ce, compute-optimizer, cost-optimization-hub, and (optionally) support. Activate Cost Explorer and opt-in to Compute Optimizer + Cost Optimization Hub.
+compatibility: Requires AWS CLI, gcloud, and/or Azure CLI configured. Read access to billing/recommender/advisor services. Opt-ins where needed (e.g. Compute Optimizer, Recommender).
 ---
 
-# Cloud Cost Agent (AWS Native)
+# Cloud Cost Agent (AWS + GCP + Azure)
 
-Perform a complete, high-signal cost optimization audit and savings analysis **using only official AWS tools and APIs**.
+Unified agent skill for **native cloud cost optimization** across the top 3 providers.
 
-Never rely on third-party dashboards. Pull live data, quantify savings, prioritize by impact + effort, and produce clear next actions.
+**Core rule**: Always use the provider's official CLI and recommendation engines. No third-party tools.
 
-## Safety Rules (Strict)
+## Safety & Best Practices (All Providers)
+- Start read-only.
+- Always use provider auth (`--profile`, `gcloud --project`, `az account set`).
+- Use `--query` / `--format json` for clean output.
+- Prioritize: highest estimated savings → lowest effort.
+- Confirm before any change (delete, resize, purchase commitment).
+- Prefer quick wins (idle delete, rightsizing to smaller, enable committed use where clear).
 
-- All commands start **read-only**.
-- Always specify `--profile` and `--region` when relevant.
-- Use `--query` and `--output json` for clean, parseable results.
-- Never run delete, purchase, or resize commands without explicit user confirmation ("yes, apply this").
-- Prefer filters that surface quick wins first (VeryLow/Low effort, high savings).
+## How to Use
+Tell the agent the provider(s) and goal:
 
-## 1. Pre-flight (Foundations)
+Examples:
+- `/cloud-cost-agent audit AWS last 30 days`
+- `/cloud-cost-agent find quick wins on GCP and Azure`
+- `/cloud-cost-agent rightsizing recommendations for all clouds`
 
+The skill will branch to the correct native commands.
+
+## 1. Pre-flight & Authentication
+
+**AWS**
 ```bash
-# Who am I and what accounts?
 aws sts get-caller-identity
 aws ce get-cost-and-usage \
   --time-period Start=$(date -v-30d +%Y-%m-%d),End=$(date +%Y-%m-%d) \
-  --granularity MONTHLY \
-  --metrics "UnblendedCost" \
-  --query 'ResultsByTime[0].Total'
-
-# Check opt-in status (important)
-aws compute-optimizer get-enrollment-status
-aws cost-optimization-hub list-enrollment-statuses 2>/dev/null || echo "Cost Optimization Hub may need opt-in"
+  --granularity MONTHLY --metrics "UnblendedCost"
 ```
 
-**If not opted in:**
-- Console: Billing → Cost Optimization Hub → Opt in
-- Compute Optimizer: Enable via console or `aws compute-optimizer update-enrollment-status --status Active`
-
-## 2. Centralized Recommendations (Best Starting Point)
-
-Use **Cost Optimization Hub** — it aggregates the best signals.
-
+**GCP**
 ```bash
-# Quick wins only (VeryLow + Low effort)
-aws cost-optimization-hub list-recommendations \
-  --filter '{
-    "implementationEfforts": ["VeryLow", "Low"],
-    "actionTypes": ["Rightsize", "Stop", "Delete", "MigrateToGraviton"]
-  }' \
-  --query 'items[?estimatedMonthlySavings > `5`] | sort_by(@, &estimatedMonthlySavings) | reverse(@)' \
-  --output json
+gcloud auth list
+gcloud config set project YOUR_PROJECT
+gcloud billing accounts list
+```
 
-# All high-impact recommendations (sorted by savings)
+**Azure**
+```bash
+az account show
+az account set --subscription "SUB_ID"
+```
+
+## 2. Centralized / High-Impact Recommendations
+
+### AWS (Cost Optimization Hub — best aggregator)
+```bash
 aws cost-optimization-hub list-recommendations \
-  --order-by dimension=EstimatedMonthlySavings,order=Desc \
-  --query 'items[?estimatedMonthlySavings > `20`]' \
+  --filter '{"implementationEfforts":["VeryLow","Low"]}' \
+  --query 'items[?estimatedMonthlySavings > `10`] | sort_by(@, &estimatedMonthlySavings) | reverse(@)' \
   --output json
 ```
 
-Key fields to highlight:
-- `estimatedMonthlySavings`
-- `actionType`
-- `implementationEffort`
-- `resourceType` / `resourceId`
-- `restartNeeded`, `rollbackPossible`
-
-## 3. Rightsizing & Compute Recommendations
+### GCP (Recommender — main source)
+List top cost recommenders (machine type, idle, CUDs):
 
 ```bash
-# Over-provisioned EC2 instances
-aws compute-optimizer get-ec2-instance-recommendations \
-  --filters name=Finding,values=Overprovisioned \
-  --query 'instanceRecommendations[].{Instance: instanceArn, Current: currentInstanceType, Recommendation: recommendationOptions[0].instanceType, Savings: estimatedMonthlySavings, PerformanceRisk: recommendationOptions[0].performanceRisk}' \
-  --output table
+# Rightsizing VMs
+gcloud recommender recommendations list \
+  --recommender=google.compute.instance.MachineTypeRecommender \
+  --project=YOUR_PROJECT \
+  --location=us-central1-a \
+  --format=json
 
-# Lambda rightsizing
-aws compute-optimizer get-lambda-function-recommendations \
-  --filters name=Finding,values=Underprovisioned,Overprovisioned
+# Idle resources
+gcloud recommender recommendations list \
+  --recommender=google.compute.instance.IdleResourceRecommender \
+  --project=YOUR_PROJECT \
+  --format="table(description, primaryImpact.costProjection.cost.units, stateInfo.state)"
 
-# EBS volumes (often big quick wins)
-aws compute-optimizer get-ebs-volume-recommendations
+# Committed Use Discounts
+gcloud recommender recommendations list \
+  --recommender=google.cloudbilling.commitment.SpendBasedCommitmentRecommender \
+  --billing-project=YOUR_BILLING_PROJECT
 ```
 
-Also pull projected metrics when evaluating a specific recommendation:
+### Azure (Advisor Cost category)
 ```bash
-aws compute-optimizer get-ec2-recommendation-projected-metrics \
-  --instance-arn <arn> \
-  --recommended-instance-type <type>
+az advisor recommendation list \
+  --category Cost \
+  --query "[].{Resource: shortDescription.problem, Impact: impact, AnnualSavings: extendedProperties.annualSavingsAmount, Currency: extendedProperties.savingsCurrency}" \
+  -o table
+
+# More detailed
+az advisor recommendation list --category Cost \
+  --query "[?impact=='High'].{Id:id, Resource:resourceMetadata.resourceId, Savings:extendedProperties.annualSavingsAmount}" -o json
 ```
 
-## 4. Savings Plans & Commitments
+## 3. Cost & Usage Breakdown
 
+**AWS**
 ```bash
-# Compute Savings Plans recommendation (most flexible)
-aws ce get-savings-plans-purchase-recommendation \
-  --savings-plans-type COMPUTE_SP \
-  --term-in-years ONE_YEAR \
-  --payment-option NO_UPFRONT \
-  --lookback-period-in-days THIRTY_DAYS \
-  --query 'savingsPlansPurchaseRecommendation'
-
-# Check current coverage/utilization
-aws ce get-savings-plans-coverage \
-  --time-period Start=$(date -v-30d +%Y-%m-%d),End=$(date +%Y-%m-%d) \
-  --granularity DAILY
-```
-
-## 5. Cost Explorer Deep Dive
-
-```bash
-# Last 30 days by service (top spenders)
 aws ce get-cost-and-usage \
   --time-period Start=$(date -v-30d +%Y-%m-%d),End=$(date +%Y-%m-%d) \
   --granularity DAILY \
   --metrics "UnblendedCost" \
-  --group-by Type=DIMENSION,Key=SERVICE \
-  --query 'ResultsByTime[].Groups[?Metrics.UnblendedCost.Amount > `1`]'
-
-# By instance type (great for rightsizing context)
-aws ce get-cost-and-usage \
-  --time-period Start=$(date -v-90d +%Y-%m-%d),End=$(date +%Y-%m-%d) \
-  --granularity MONTHLY \
-  --metrics "UnblendedCost" \
-  --group-by Type=DIMENSION,Key=INSTANCE_TYPE
+  --group-by Type=DIMENSION,Key=SERVICE
 ```
 
-## 6. Idle & Waste Resources (via CUR + Compute Optimizer)
-
-When CUR is enabled, combine with Athena queries from the Well-Architected Labs library or use:
-
+**GCP**
+Use BigQuery export (recommended) or:
 ```bash
-# Idle recommendations (newer Compute Optimizer capability)
-aws compute-optimizer get-idle-recommendations
+gcloud billing accounts get-iam-policy BILLING_ACCOUNT
+# For detailed: query your BigQuery billing export table
 ```
 
-Common high-ROI waste categories to check manually via CLI or CUR:
-- Unattached EBS volumes
-- Old snapshots
-- Idle NAT Gateways / Load Balancers
-- Over-provisioned storage
-
-## 7. Trusted Advisor Cost Checks (Business+)
-
+**Azure**
 ```bash
-# List cost optimization checks
-aws support describe-trusted-advisor-checks \
-  --language en \
-  --query "checks[?category=='cost_optimizing'].{Name:name, Id:id}" \
-  --output table
+# Usage details
+az consumption usage list --start-date $(date -v-30d +%Y-%m-%d) --end-date $(date +%Y-%m-%d) \
+  --query "[].{Resource:instanceName, Service:consumedService, Cost:pretaxCost}" -o table
 
-# Example: get results for a specific check ID
-aws support describe-trusted-advisor-check-result \
-  --check-id <check-id> \
-  --query 'result'
+# Or via costmanagement export + query (for aggregated)
+az costmanagement export list --scope "/subscriptions/..."
 ```
 
-## 8. Prioritization & Reporting
+## 4. Rightsizing & Compute Recommendations
 
-When presenting results to the user or in an agent response, always:
+**AWS** — see Compute Optimizer section in original AWS skill (get-ec2-instance-recommendations, etc.)
 
-1. Calculate **total estimated monthly savings**.
-2. Break down into buckets: Quick wins (VeryLow/Low effort), Medium, High.
-3. List top 5-10 with:
-   - Resource / service
-   - Current vs recommended (if applicable)
-   - $ savings
-   - Effort + risk notes
-4. End with 2-3 concrete next CLI commands the user (or agent) can run.
-
-Example summary template:
-```
-Total potential monthly savings: $X,XXX
-
-Quick wins ($Y):
-- Rightsize i-abc123 t3.large → t3.medium : $48/mo (VeryLow effort)
-- Delete unattached EBS vol-xyz : $22/mo (VeryLow)
-
-Next actions:
-aws cost-optimization-hub get-recommendation --recommendation-id ...
+**GCP**
+```bash
+gcloud recommender recommendations list \
+  --recommender=google.compute.instance.MachineTypeRecommender \
+  --format=json | jq '.[] | select(.primaryImpact.costProjection.cost.units < 0)'
 ```
 
-## 9. Full Monthly Audit Flow (recommended)
+**Azure**
+Advisor Cost recommendations already include VM rightsizing and underutilized resources.
 
-1. Run the Cost Optimization Hub quick-wins query (step 2).
-2. Run Compute Optimizer overprovisioned + idle (step 3).
-3. Check Savings Plans opportunity (step 4).
-4. Get top 3 services by spend from Cost Explorer (step 5).
-5. Produce one combined report with prioritized list + total savings.
-6. Ask user which category to drill deeper or action.
+## 5. Commitments & Discounts
 
-## References (keep these handy)
+**AWS**: Savings Plans / RIs via `aws ce get-savings-plans-purchase-recommendation`
 
-- Well-Architected Cost Optimization Pillar: https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html
-- Cost Explorer CLI: https://docs.aws.amazon.com/cli/latest/reference/ce/
-- Compute Optimizer CLI: https://docs.aws.amazon.com/cli/latest/reference/compute-optimizer/
-- Cost Optimization Hub: https://docs.aws.amazon.com/cost-management/latest/userguide/coh-getting-started.html
-- CUR Query Library: https://www.wellarchitectedlabs.com/cost-optimization/cur_queries/
+**GCP**: Committed Use Discounts via Recommender (SpendBasedCommitmentRecommender + CUD recommenders)
 
-## Extending This Skill
+**Azure**: 
+```bash
+# Reservation recommendations surface in Advisor Cost
+az advisor recommendation list --category Cost \
+  --query "[?contains(shortDescription.problem, 'reserved') || contains(shortDescription.problem, 'reservation')]"
+```
 
-Add new playbooks as additional sections:
-- Storage optimization (S3 Intelligent-Tiering, gp2→gp3)
-- Data transfer analysis
-- Tagging & cost allocation gaps
-- Anomaly response
+## 6. Prioritization Template (for any provider)
 
-Always keep commands copy-paste safe and output-friendly for agents.
+When summarizing:
+1. Total estimated monthly / annual savings.
+2. Quick wins bucket (VeryLow/Low effort or equivalent).
+3. Top 5-8 items with: Resource, Current state, Recommended action, $ savings, Effort/risk.
+4. Concrete next command for the top item.
+
+Example output structure:
+```
+Provider: GCP
+Total potential monthly savings: $2,340
+
+Quick wins:
+- Delete idle VM ... : $180/mo (VeryLow)
+- Rightsize n1-standard-8 → n2-standard-4 : $420/mo
+
+Next command:
+gcloud recommender recommendations list --recommender=google.compute.instance.IdleResourceRecommender ...
+```
+
+## Provider-Specific Quick Commands Reference
+
+### AWS (most mature centralized tools)
+- Hub for broad view
+- Compute Optimizer for deep rightsizing
+- Full details in previous AWS-only version of this skill
+
+### GCP
+Key recommenders to always check:
+- MachineTypeRecommender (rightsizing)
+- IdleResourceRecommender (VMs, images, disks, IPs)
+- SpendBasedCommitmentRecommender
+- Storage and BigQuery specific ones
+
+Use `--location` for zonal recommenders and project scope.
+
+### Azure
+- Advisor is the primary source for Cost recommendations.
+- Pair with `az consumption` or `az costmanagement` for raw usage.
+- Export jobs (`az costmanagement export create`) for CUR-like data.
+
+## Full Audit Flow (Recommended)
+
+1. Authenticate to the desired cloud(s).
+2. Pull high-level cost summary for last 30/90 days.
+3. Pull recommendations (Hub / Recommender / Advisor).
+4. Filter for savings > threshold and low effort.
+5. Cross-check with raw usage if needed.
+6. Produce prioritized list + 3 concrete next actions.
+7. (Optional) Repeat for other providers.
+
+## Extending
+Add new sections for:
+- Storage optimization (S3/GCS/Blob lifecycle)
+- Networking / data transfer
+- Kubernetes / container cost tuning
+- Anomaly detection equivalents
+
+Keep all commands safe, copy-pasteable, and focused on native capabilities.
+
+## References
+
+**AWS**
+- Cost Explorer / Compute Optimizer / Cost Optimization Hub docs (see previous)
+
+**GCP**
+- Recommender docs: https://cloud.google.com/recommender/docs/recommenders
+- Active Assist / Cost optimization
+
+**Azure**
+- Azure Advisor cost recommendations: https://learn.microsoft.com/azure/advisor/advisor-reference-cost-recommendations
+- Cost Management CLI: az costmanagement
+- Consumption usage
+
+This skill is designed to be the go-to agent for real cloud cost savings across AWS, GCP, and Azure using only what each provider gives you.
 
 ---
 
-This skill is designed to be the single source of truth for AWS-native cost saving actions inside an agent. Keep it focused, safe, and brutally effective.
+Run it with a specific provider or across all three. Stay native. Stay effective.

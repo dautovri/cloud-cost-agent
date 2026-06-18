@@ -1,128 +1,107 @@
 # cloud-cost-agent
 
-Cloud cost agent: AWS-native cost optimization skills, CLI patterns, and references for Grok and Claude agents.
+**Cloud Cost Agent** — native cost optimization skills and CLI patterns for the top 3 cloud providers (AWS, Google Cloud, Azure) using only official tools.
 
-Focus: **Save money on AWS using only official AWS services** — no third-party dashboards or SaaS required.
+Focus: **Save real money on AWS, GCP, and Azure** with agent-friendly skills for Grok, Claude, and similar. No third-party SaaS or dashboards required.
 
-## Why This Exists
+## The Idea
 
-Most cloud cost tools are heavy web dashboards that duplicate what AWS already provides well. This project delivers **agent-first, CLI-powered skills** that let you (or an AI agent) directly:
+The original cloud-cost project is a web dashboard. This repo takes the **same goal** (cost visibility + actionable savings) and implements it as **lightweight, powerful skills** that run directly in your terminal/agent using each provider's native CLIs and recommendation engines.
 
-- Pull fresh, authoritative recommendations
-- Quantify real savings opportunities
-- Prioritize by impact + effort
-- Generate exact commands and reports
-- Stay inside the AWS security and data boundary
+- **AWS**: Cost Explorer, Compute Optimizer, Cost Optimization Hub
+- **Google Cloud**: Recommender (Active Assist), Billing exports to BigQuery
+- **Azure**: Advisor (Cost recommendations), Cost Management / Consumption APIs
 
-Built for use inside Grok Build, Claude Code, Cursor, or any terminal-based agent workflow.
+## Why Native Agent Skills?
 
-## Core AWS-Native Surfaces
+- Fresh data on demand
+- Works inside Cursor, Claude Code, Grok, etc.
+- Precise control with filters and queries
+- Lower overhead than full dashboards
+- Stays in your existing auth (aws/gcloud/az login)
 
-- **Cost Explorer** (`aws ce`)
-  - `get-cost-and-usage`, `get-rightsizing-recommendation`
-  - Savings Plans purchase recommendations, utilization, forecasts, anomalies
+## Quick Start
 
-- **Compute Optimizer** (`aws compute-optimizer`)
-  - Rightsizing for EC2, Auto Scaling Groups, Lambda, EBS, RDS
-  - Idle resource detection + projected metrics
-
-- **Cost Optimization Hub** (`aws cost-optimization-hub`)
-  - `list-recommendations` — centralized, filterable view across all sources
-  - Best single source for agents (filter by effort, action type, savings)
-
-- **Trusted Advisor** (cost_optimizing checks via `aws support`)
-- **Cost and Usage Reports (CUR) + Athena** (deep custom analysis)
-- Supporting: Budgets, Savings Plans, S3 lifecycle patterns, tagging
-
-## Quick Start (as a Skill)
-
-1. Copy `SKILL.md` into your skills directory:
-   - `~/.grok/skills/aws-cost-optimizer/SKILL.md`
-   - or `~/.claude/skills/aws-cost-optimizer/SKILL.md`
-
-2. (Optional) Add the skill via `/create-skill` flow and paste the content.
-
-3. Invoke:
-   ```
-   /aws-cost-optimizer analyze my spend last 30 days
-   /aws-cost-optimizer find quick wins
+1. Copy the skill:
+   ```bash
+   mkdir -p ~/.grok/skills/cloud-cost-agent
+   cp SKILL.md ~/.grok/skills/cloud-cost-agent/
+   # or for Claude: ~/.claude/skills/cloud-cost-agent/
    ```
 
-See [SKILL.md](./SKILL.md) for the full prompt package.
+2. Use it:
+   ```
+   /cloud-cost-agent audit my AWS spend
+   /cloud-cost-agent find quick wins on GCP
+   /cloud-cost-agent recommendations for Azure last 90 days
+   ```
 
-## Recommended IAM Permissions (read-only)
+## Core Native Surfaces by Provider
 
-Use least-privilege. Key managed policies + actions:
+### AWS
+- `aws ce` (Cost Explorer): get-cost-and-usage, rightsizing, Savings Plans recommendations
+- `aws compute-optimizer`: rightsizing + idle for EC2, Lambda, EBS, RDS
+- `aws cost-optimization-hub`: centralized recommendations with effort/savings filters
+- CUR + Athena for deep analysis
 
-- `CostOptimizationHubReadOnlyAccess`
-- `ComputeOptimizerReadOnlyAccess`
-- Cost Explorer / billing read access (see AWS docs for `ce:*` and Billing Console activation)
+### Google Cloud (GCP)
+- `gcloud recommender recommendations list`: Machine type rightsizing, idle VMs, committed use discounts, storage, etc.
+- Recommender Hub + Active Assist
+- Billing export to BigQuery (CUR equivalent)
+- `gcloud billing` and `gcloud alpha billing` for some queries
 
-Example minimal policy available in `docs/iam-readonly-policy.json` (to be added).
+Key recommenders:
+- `google.compute.instance.MachineTypeRecommender`
+- `google.compute.instance.IdleResourceRecommender`
+- Spend-based CUD recommender
+
+### Azure
+- `az advisor recommendation list --category Cost`: rightsizing, idle resources, reservations
+- `az costmanagement` (export + query for usage/cost data)
+- `az consumption usage list` for detailed usage
+- Reservations / Savings plans recommendations via Advisor
+
+## Supported Use Cases (All Providers)
+- Cost breakdown by service / resource
+- Rightsizing / machine type recommendations
+- Idle / unused resource detection
+- Commitment / reservation / CUD purchase recommendations
+- Quick wins prioritization (by estimated savings + effort)
+- Exportable reports
 
 ## Repository Structure
 
 ```
-aws-cost-optimizer/
-├── SKILL.md                 # Primary Grok/Claude skill definition
+cloud-cost-agent/
+├── SKILL.md                 # Main multi-cloud skill (provider-aware)
 ├── README.md
-├── .gitignore
-├── docs/                    # References, IAM snippets, runbooks
-│   └── ...
-└── references/              # Curated CUR queries, command examples
+├── docs/
+│   ├── iam-readonly-policy.json   # AWS
+│   ├── gcp-setup.md
+│   └── azure-setup.md
+└── references/              # Additional queries & patterns
 ```
 
 ## Design Principles
+- Native only — use the provider's own recommendation engines.
+- Agent-optimized — clean JSON output, safe `--query` filters.
+- Safe by default — read-only first, explicit confirmation for changes.
+- Multi-cloud ready — one skill to rule them all or focus per provider.
+- Prioritize impact — sort by $ savings, then implementation effort.
 
-- **AWS only** — every recommendation and data source comes from AWS APIs/CLI.
-- **Agent-friendly** — clean JSON output, strong filters, actionable next steps.
-- **Safe by default** — read-only commands first. Any mutating action requires explicit confirmation.
-- **Prioritize impact** — sort by estimated monthly savings, then by implementation effort (VeryLow/Low first).
-- **Reproducible** — document exact commands so humans or agents can re-run.
-
-## Useful Commands (examples)
-
-```bash
-# Top rightsizing opportunities (Compute Optimizer)
-aws compute-optimizer get-ec2-instance-recommendations \
-  --filters name=Finding,values=Overprovisioned \
-  --query 'instanceRecommendations[?estimatedMonthlySavings>`0`]'
-
-# Centralized recommendations from Cost Optimization Hub (very powerful)
-aws cost-optimization-hub list-recommendations \
-  --filter '{"implementationEfforts":["VeryLow","Low"],"actionTypes":["Rightsize","Stop","Delete"]}' \
-  --query 'items | sort_by(@, &estimatedMonthlySavings) | reverse(@)' \
-  --output json
-
-# Savings Plans recommendations
-aws ce get-savings-plans-purchase-recommendation \
-  --savings-plans-type COMPUTE_SP \
-  --term-in-years THREE_YEARS \
-  --payment-option NO_UPFRONT
-```
-
-See `SKILL.md` for many more templated, safe, query-heavy examples.
+## Next Steps / Roadmap
+- Add more detailed playbooks per provider (storage, networking, data transfer)
+- CUR/BigQuery/Athena style query libraries for each
+- Unified savings calculator across clouds
+- Integration hooks back to the main cloud-cost dashboard (if used)
 
 ## Resources
+- AWS: Well-Architected Cost Optimization Pillar + docs linked in SKILL.md
+- GCP: https://cloud.google.com/recommender/docs
+- Azure: https://learn.microsoft.com/azure/cost-management-billing + Advisor docs
 
-- [AWS Well-Architected Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html)
-- [Cost Explorer CLI Reference](https://docs.aws.amazon.com/cli/latest/reference/ce/)
-- [Compute Optimizer CLI](https://docs.aws.amazon.com/cli/latest/reference/compute-optimizer/)
-- [Cost Optimization Hub](https://docs.aws.amazon.com/cost-management/latest/userguide/cost-optimization-hub.html)
-- [CUR Query Library (Well-Architected Labs)](https://www.wellarchitectedlabs.com/cost-optimization/cur_queries/)
-
-## Private Repo
-
-This is an internal/private repository for fast iteration on skills and patterns.
-
-## License
-
-Internal use. MIT-style if extracted later.
-
-## Contributing
-
-For the owner: edit `SKILL.md`, improve command templates, add new high-signal playbooks, keep everything strictly AWS-native.
+This is a private/internal repo for fast iteration on cloud cost agent skills.
 
 ---
 
-Generated as the dedicated home for AWS-native cost saving skills and tooling.
+Run `/cloud-cost-agent` to start saving money across your clouds.
