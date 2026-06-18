@@ -1,6 +1,6 @@
-# aws-cost-optimizer
+# cloud-cost-agent
 
-AWS-native cost optimization skills, CLI patterns, and references for Grok and Claude agents.
+Cloud cost agent: AWS-native cost optimization skills, CLI patterns, and references for Grok and Claude agents.
 
 Focus: **Save money on AWS using only official AWS services** — no third-party dashboards or SaaS required.
 

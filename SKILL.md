@@ -1,12 +1,12 @@
 ---
-name: aws-cost-optimizer
+name: cloud-cost-agent
 description: AWS-native cost optimization and savings using only official AWS services (Cost Explorer, Compute Optimizer, Cost Optimization Hub, CUR). Use when the user wants to analyze AWS spend, find savings opportunities, run a cost audit, get rightsizing recommendations, Savings Plans advice, or generate actionable optimization reports with Grok or Claude.
 when-to-use: Analyze AWS bill, find waste, rightsizing, idle resources, savings plans, cost optimization audit, quick wins on AWS spend.
 allowed-tools: Bash
 compatibility: Requires AWS CLI v2 configured with read access to ce, compute-optimizer, cost-optimization-hub, and (optionally) support. Activate Cost Explorer and opt-in to Compute Optimizer + Cost Optimization Hub.
 ---
 
-# AWS Cost Optimizer (Native)
+# Cloud Cost Agent (AWS Native)
 
 Perform a complete, high-signal cost optimization audit and savings analysis **using only official AWS tools and APIs**.
 
