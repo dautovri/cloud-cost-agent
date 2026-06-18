@@ -1,40 +1,117 @@
 # cloud-cost-agent
 
-**Cloud Cost Agent** — native cost optimization skills and CLI patterns for the top 3 cloud providers (AWS, Google Cloud, Azure) using only official tools.
+**Cloud Cost Agent** — the open-source, native-first FinOps agent skills for AWS, GCP, and Azure.
 
-Focus: **Save real money on AWS, GCP, and Azure** with agent-friendly skills for Grok, Claude, and similar. No third-party SaaS or dashboards required.
+**Tagline**: Actionable cloud cost savings inside your AI coding agent (Claude Code, Cursor, Gemini CLI, Grok, etc.). Purely native tools. No new SaaS dashboard required.
 
-## The Idea
+Focus: **Save real money** using each provider's official CLIs and recommendation engines (Cost Explorer/Compute Optimizer/Hub, Recommender, Advisor, etc.).
 
-The original cloud-cost project is a web dashboard. This repo takes the **same goal** (cost visibility + actionable savings) and implements it as **lightweight, powerful skills** that run directly in your terminal/agent using each provider's native CLIs and recommendation engines.
+## Why This Product?
 
-- **AWS**: Cost Explorer, Compute Optimizer, Cost Optimization Hub
-- **Google Cloud**: Recommender (Active Assist), Billing exports to BigQuery
-- **Azure**: Advisor (Cost recommendations), Cost Management / Consumption APIs
+Cloud bills are exploding, but most tools are heavy dashboards that duplicate native capabilities. AI agents are transforming how we work — yet they lack accurate, provider-specific FinOps knowledge.
 
-## Why Native Agent Skills?
+Cloud Cost Agent fills the gap with **portable skills + lightweight CLI + MCP tools** that:
+- Leverage native recommenders directly for fresh, authoritative data.
+- Deliver structured playbooks and exact CLI commands inside any compatible agent.
+- Enable shift-left cost decisions and (guarded) automation.
 
-- Fresh data on demand
-- Works inside Cursor, Claude Code, Grok, etc.
-- Precise control with filters and queries
-- Lower overhead than full dashboards
-- Stays in your existing auth (aws/gcloud/az login)
+**Differentiation**:
+- Native-only core (no mandatory data ingestion).
+- Agent-native by design (SKILL.md format — works across tools).
+- Multi-cloud from day one.
+- Lightweight and open-core.
 
-## Quick Start
+See [PRODUCT.md](./PRODUCT.md) for full vision, monetization, and roadmap.
 
-1. Copy the skill:
-   ```bash
-   mkdir -p ~/.grok/skills/cloud-cost-agent
-   cp SKILL.md ~/.grok/skills/cloud-cost-agent/
-   # or for Claude: ~/.claude/skills/cloud-cost-agent/
-   ```
+## Market Context (2026)
+AI FinOps agents are a major trend (Vantage FinOps Agent with GitHub remediation, AWS Bedrock samples, emerging skills repos). Teams want **action**, not more dashboards. Native + skills is the lightweight, developer-friendly path.
 
-2. Use it:
-   ```
-   /cloud-cost-agent audit my AWS spend
-   /cloud-cost-agent find quick wins on GCP
-   /cloud-cost-agent recommendations for Azure last 90 days
-   ```
+## Quick Install (One Command)
+
+```bash
+# For most agents (Claude Code, Cursor, Gemini CLI, etc.)
+curl -sL https://raw.githubusercontent.com/dautovri/cloud-cost-agent/main/install.sh | bash
+
+# Or manually copy the skill
+mkdir -p ~/.grok/skills/cloud-cost-agent
+cp SKILL.md ~/.grok/skills/cloud-cost-agent/
+```
+
+Supports the emerging Agent Skills / SKILL.md standard (portable to Claude, Gemini CLI, Cursor, and more).
+
+## Core Usage
+
+```
+/cloud-cost-agent audit my AWS spend last 30 days
+/cloud-cost-agent find quick wins on GCP and Azure
+/cloud-cost-agent rightsizing recommendations --provider all
+```
+
+The skill branches intelligently per provider and outputs:
+- Native CLI commands with safe filters.
+- Prioritized savings (by $ impact + effort).
+- Concrete next steps.
+
+## Core Native Surfaces
+
+### AWS
+- `aws ce`, `aws compute-optimizer`, `aws cost-optimization-hub`
+- CUR + Athena for depth
+
+### Google Cloud
+- `gcloud recommender` (MachineType, IdleResource, CUDs, etc.)
+- Billing export to BigQuery
+
+### Azure
+- `az advisor recommendation list --category Cost`
+- `az costmanagement` / consumption for data
+- Reservations & Advisor
+
+## Features (Current + Planned)
+
+**Free / Open Core**
+- Multi-provider SKILL.md + 20+ playbooks (rightsizing, idle, commitments, waste taxonomy, etc.)
+- CLI helper for direct audits
+- MCP server for agent tool calling
+- Install for popular coding agents
+- GitHub examples for PR suggestions
+
+**Growth / Paid Layers** (roadmap)
+- Hosted agent + MCP
+- Automated remediation with guardrails (GitHub integration)
+- Advanced reporting & savings tracking
+- Enterprise features (SSO, policies, custom playbooks)
+- Outcome pricing (share of realized savings)
+
+## Positioning vs Competitors
+- Vs Vantage/CloudZero/Amnic: No heavy platform lock-in for core use. Skills work in your existing agent.
+- Vs pure dashboards: Actionable + agent-integrated from the start.
+- Vs AWS-only Bedrock agents: True multi-cloud (AWS+GCP+Azure) with portable skills.
+
+## Get Involved / Productize
+- Star the repo and try the skill.
+- Contribute playbooks or provider deep-dives.
+- Use as foundation for internal tools or a commercial product (open-core model works well — see similar FinOps skills repos).
+- Feedback welcome on GitHub issues.
+
+## Quick Start (Manual)
+
+1. Copy the skill into your agent skills directory.
+2. Authenticate to the clouds you use (`aws`, `gcloud`, `az login`).
+3. Ask your agent: "Use cloud-cost-agent to find savings opportunities."
+
+See SKILL.md for detailed instructions and safety rules.
+
+## Resources
+- [PRODUCT.md](./PRODUCT.md) — Full product vision and roadmap
+- Native docs: AWS Well-Architected Cost Pillar, GCP Recommender, Azure Advisor
+- Related: FinOps Foundation, FOCUS spec
+
+Built to turn native cloud capabilities into agent-powered savings at scale.
+
+---
+
+*This is the evolution of cost visibility into the agent era — native, portable, actionable.*
 
 ## Core Native Surfaces by Provider
 
