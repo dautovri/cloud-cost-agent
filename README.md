@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="cloud cost agent" width="420">
+</p>
+
 # cloud-cost-agent
 
 Native-first FinOps agent skill for **AWS, GCP, and Azure**. Find real cloud savings from inside your AI coding agent (Claude Code, Cursor, Gemini CLI, etc.) — using each provider's own CLIs and recommendation engines. No new dashboard, no data ingestion.
