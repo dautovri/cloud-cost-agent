@@ -1,0 +1,75 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CostExplorerRead",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostAndUsageWithResources",
+        "ce:GetRightsizingRecommendation",
+        "ce:GetSavingsPlansPurchaseRecommendation",
+        "ce:GetSavingsPlansUtilization",
+        "ce:GetSavingsPlansCoverage",
+        "ce:GetCostForecast",
+        "ce:GetDimensionValues",
+        "ce:GetTags",
+        "ce:GetAnomalies",
+        "ce:GetAnomalyMonitors",
+        "ce:GetSavingsPlansUtilizationDetails"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ComputeOptimizerRead",
+      "Effect": "Allow",
+      "Action": [
+        "compute-optimizer:GetEnrollmentStatus",
+        "compute-optimizer:GetEC2InstanceRecommendations",
+        "compute-optimizer:GetAutoScalingGroupRecommendations",
+        "compute-optimizer:GetEC2RecommendationProjectedMetrics",
+        "compute-optimizer:GetLambdaFunctionRecommendations",
+        "compute-optimizer:GetEBSVolumeRecommendations",
+        "compute-optimizer:GetRDSRecommendations",
+        "compute-optimizer:GetIdleRecommendations",
+        "compute-optimizer:GetRecommendationSummaries"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CostOptimizationHubRead",
+      "Effect": "Allow",
+      "Action": [
+        "cost-optimization-hub:ListRecommendations",
+        "cost-optimization-hub:GetRecommendation",
+        "cost-optimization-hub:ListEnrollmentStatuses",
+        "cost-optimization-hub:GetPreferences"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "TrustedAdvisorCostChecks",
+      "Effect": "Allow",
+      "Action": [
+        "support:DescribeTrustedAdvisorChecks",
+        "support:DescribeTrustedAdvisorCheckResult",
+        "support:DescribeTrustedAdvisorCheckSummaries"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "support:Category": "cost_optimizing"
+        }
+      }
+    },
+    {
+      "Sid": "BillingReadBasic",
+      "Effect": "Allow",
+      "Action": [
+        "aws-portal:ViewBilling",
+        "aws-portal:ViewUsageReports"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

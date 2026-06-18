@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment & secrets (never commit real credentials)
+.env
+.env.local
+.env.*.local
+*.pem
+aws-credentials*
+credentials
+config
+
+# Logs & temp
+*.log
+tmp/
+temp/
+
+# Misc
+*.bak
