@@ -1,0 +1,14 @@
+{
+  "name": "cloud-cost-agent",
+  "owner": {
+    "name": "Ruslan Dautov",
+    "url": "https://github.com/dautovri"
+  },
+  "plugins": [
+    {
+      "name": "cloud-cost-agent",
+      "source": "./",
+      "description": "Native-first FinOps agent for AWS, GCP, and Azure — finds cloud savings via each provider's own CLIs and recommendation engines."
+    }
+  ]
+}

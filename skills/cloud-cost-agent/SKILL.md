@@ -1,14 +1,14 @@
 ---
 name: cloud-cost-agent
-description: Multi-cloud cost optimization and savings agent for the top 3 providers (AWS, Google Cloud, Azure). Uses only native CLI tools and recommendation services (Cost Explorer/Compute Optimizer, GCP Recommender, Azure Advisor + Cost Management). Use for analyzing spend, finding rightsizing opportunities, idle resources, commitment recommendations, and generating prioritized savings reports.
-when-to-use: Analyze cloud spend, cost audit, find savings, rightsizing, idle resources across AWS/GCP/Azure. Support for provider-specific or cross-cloud queries.
+description: Use when analyzing cloud spend, running a cost audit, or finding savings across AWS, Google Cloud, and Azure — rightsizing, idle resources, and commitment/reservation recommendations, per-provider or cross-cloud. Uses only native CLIs and recommendation services (Cost Explorer/Compute Optimizer/Cost Optimization Hub, GCP Recommender, Azure Advisor + Cost Management) to produce prioritized savings reports.
 allowed-tools: Bash
-compatibility: Requires AWS CLI, gcloud, and/or Azure CLI configured. Read access to billing/recommender/advisor services. Opt-ins where needed (e.g. Compute Optimizer, Recommender).
 ---
 
 # Cloud Cost Agent (AWS + GCP + Azure)
 
 Unified agent skill for **native cloud cost optimization** across the top 3 providers.
+
+**Requirements**: AWS CLI, `gcloud`, and/or Azure CLI configured with read access to billing/recommender/advisor services. Some sources need opt-in (e.g. AWS Compute Optimizer, GCP Recommender).
 
 **Core rule**: Always use the provider's official CLI and recommendation engines. No third-party tools.
 
