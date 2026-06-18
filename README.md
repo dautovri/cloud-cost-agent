@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="cloud cost agent" width="420">
+  <img src="assets/logo.png" alt="cloud cost agent" width="300">
 </p>
 
 # cloud-cost-agent
