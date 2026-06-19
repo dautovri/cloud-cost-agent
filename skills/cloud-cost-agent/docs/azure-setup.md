@@ -17,14 +17,15 @@ Managed roles:
 - `Reader`
 
 ## Cost Data
-- Use `az consumption usage list` for quick usage.
-- Create exports with `az costmanagement export create` for ongoing detailed data (like CUR).
+- **Primary:** `az costmanagement export create` for ongoing detailed data (CUR-equivalent), or the Cost Details API for on-demand pulls.
+- **Fallback only:** `az consumption usage list` — the Consumption Usage Details API is on Microsoft's deprecation path; don't build new pipelines on it.
+- There is **no `az costmanagement query` CLI subcommand** — the Query capability is REST-only (call it via `az rest`).
 - Advisor for most actionable cost recommendations.
 
 ## Key Commands
 See the main SKILL.md for:
 - `az advisor recommendation list --category Cost`
-- `az costmanagement` and consumption queries.
+- `az costmanagement export` (and the `az rest` Query API for ad-hoc aggregation).
 
 ## Recommendations Notes
 Azure Advisor Cost recommendations include VM rightsizing, idle resources, and reservation suggestions. They appear after sufficient usage data (usually days to weeks).

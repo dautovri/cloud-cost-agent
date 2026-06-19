@@ -10,13 +10,27 @@
         "ce:GetRightsizingRecommendation",
         "ce:GetSavingsPlansPurchaseRecommendation",
         "ce:GetSavingsPlansUtilization",
+        "ce:GetSavingsPlansUtilizationDetails",
         "ce:GetSavingsPlansCoverage",
+        "ce:GetReservationPurchaseRecommendation",
         "ce:GetCostForecast",
         "ce:GetDimensionValues",
         "ce:GetTags",
         "ce:GetAnomalies",
-        "ce:GetAnomalyMonitors",
-        "ce:GetSavingsPlansUtilizationDetails"
+        "ce:GetAnomalyMonitors"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "BillingAndUsageReportsRead",
+      "Effect": "Allow",
+      "Action": [
+        "billing:GetBillingData",
+        "billing:GetBillingDetails",
+        "billing:GetBillingPreferences",
+        "billing:ListBillingViews",
+        "cur:GetUsageReport",
+        "cur:DescribeReportDefinitions"
       ],
       "Resource": "*"
     },
@@ -30,7 +44,7 @@
         "compute-optimizer:GetEC2RecommendationProjectedMetrics",
         "compute-optimizer:GetLambdaFunctionRecommendations",
         "compute-optimizer:GetEBSVolumeRecommendations",
-        "compute-optimizer:GetRDSRecommendations",
+        "compute-optimizer:GetRDSDatabaseRecommendations",
         "compute-optimizer:GetIdleRecommendations",
         "compute-optimizer:GetRecommendationSummaries"
       ],
@@ -54,20 +68,6 @@
         "support:DescribeTrustedAdvisorChecks",
         "support:DescribeTrustedAdvisorCheckResult",
         "support:DescribeTrustedAdvisorCheckSummaries"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "support:Category": "cost_optimizing"
-        }
-      }
-    },
-    {
-      "Sid": "BillingReadBasic",
-      "Effect": "Allow",
-      "Action": [
-        "aws-portal:ViewBilling",
-        "aws-portal:ViewUsageReports"
       ],
       "Resource": "*"
     }
