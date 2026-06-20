@@ -2,9 +2,19 @@
   <img src="assets/logo.png" alt="cloud cost agent" width="300">
 </p>
 
+<p align="center">
+  <a href="https://dautovri.github.io/cloud-cost-agent/"><strong>Website</strong></a>
+  ·
+  <a href="skills/cloud-cost-agent/SKILL.md">SKILL.md</a>
+  ·
+  <a href="PRODUCT.md">Product</a>
+</p>
+
 # cloud-cost-agent
 
 Native-first FinOps agent skill for **AWS, GCP, and Azure**. Find real cloud savings from inside your AI coding agent (Claude Code, Cursor, Gemini CLI, etc.) — using each provider's own CLIs and recommendation engines. No new dashboard, no data ingestion.
+
+🌐 **[dautovri.github.io/cloud-cost-agent](https://dautovri.github.io/cloud-cost-agent/)**
 
 ## Install
 
