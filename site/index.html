@@ -187,7 +187,7 @@
     <div class="kicker">Why a skill, not a SaaS</div>
     <h2>Native, private, and action-ready.</h2>
     <div class="grid cols-3">
-      <div class="card"><div class="ic">🔒</div><h3>Zero data ingestion</h3><p>Runs locally on your existing CLI credentials. No cross-account read role to grant, no 24-hour sync, no billing data leaving your environment.</p></div>
+      <div class="card"><div class="ic">🔒</div><h3>No vendor ingestion</h3><p>Runs on the CLI credentials you already have — no cross-account read role to grant, no 24-hour sync, no billing export to a third-party FinOps database.</p></div>
       <div class="card"><div class="ic">🎯</div><h3>Native APIs = ground truth</h3><p>Queries Cost Explorer, Compute Optimizer, GCP Recommender and Azure Advisor directly — so no third-party cost miscalculation or custom-discount drift.</p></div>
       <div class="card"><div class="ic">⚡</div><h3>Lives in your agent</h3><p>One prompt in Claude Code, Cursor or Gemini. No context-switch to a portal — the insights come to the tool you already have open.</p></div>
       <div class="card"><div class="ic">📉</div><h3>Prioritized, not raw</h3><p>Output ranked by estimated savings and effort, with the exact next command — not a wall of line-items to triage yourself.</p></div>
@@ -277,6 +277,30 @@
   </div>
 </section>
 
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">Security &amp; threat model</div>
+    <h2>What it touches — stated plainly.</h2>
+    <p class="lead">No "AI magic," no buried claims. Here's exactly where your data does and doesn't go.</p>
+    <div class="grid cols-2" style="margin-top:36px">
+      <div class="card">
+        <h3>What stays out of it</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:6px">
+          <li style="padding-left:24px;position:relative;color:var(--text-soft);font-size:15px"><span style="position:absolute;left:0;color:var(--green)">✓</span>No cloud-cost-agent backend, no third-party FinOps database, no IAM role handed to a vendor.</li>
+          <li style="padding-left:24px;position:relative;color:var(--text-soft);font-size:15px"><span style="position:absolute;left:0;color:var(--green)">✓</span>Read-only first — any change is quoted back to you and needs explicit approval.</li>
+          <li style="padding-left:24px;position:relative;color:var(--text-soft);font-size:15px"><span style="position:absolute;left:0;color:var(--green)">✓</span>Ships a least-privilege read-only IAM policy. Use a dedicated <code>cost-audit</code> profile, not admin SSO.</li>
+          <li style="padding-left:24px;position:relative;color:var(--text-soft);font-size:15px"><span style="position:absolute;left:0;color:var(--green)">✓</span>Episodic and scoped — not a SaaS holding persistent access to every account.</li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--ink);border-color:transparent">
+        <h3 style="color:#fff">The honest boundary</h3>
+        <p style="color:#cbd5e1">The output of your <code style="background:rgba(255,255,255,.1);color:#e2e8f0">aws/gcloud/az</code> commands flows through your agent session into your <strong style="color:#fff">LLM provider's</strong> context — the same trust you already extend to Claude Code or Cursor with your source code. It removes the <em>FinOps vendor</em> from the loop, not the <em>model provider</em>.</p>
+        <p style="color:#cbd5e1;margin-top:12px">If your org forbids sending infra metadata to an LLM, run a local model — or don't use this. We won't pretend otherwise.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="block soft" id="install">
   <div class="wrap">
     <div class="kicker">Get started</div>
@@ -302,7 +326,7 @@
     <div style="margin-top:36px">
       <details><summary>Does this replace Vantage or CloudZero?</summary><div class="ans">No — and it doesn't try to. Those platforms provide continuous monitoring, historical data, allocation and finance reporting. This skill does episodic, native, cross-cloud savings audits inside your agent. Different job. If you need ongoing governance with finance stakeholders, keep the SaaS.</div></details>
       <details><summary>Is it safe to run against production accounts?</summary><div class="ans">Yes. It's read-only first — audits only call cost/recommendation APIs. Any change (resize, delete, purchase) is quoted back to you and requires explicit approval before it runs. Use the included least-privilege read-only IAM policy.</div></details>
-      <details><summary>Where does my billing data go?</summary><div class="ans">Nowhere. It runs locally using your existing CLI credentials and queries the provider APIs directly. There's no ingestion pipeline and no third-party backend.</div></details>
+      <details><summary>Where does my billing data go?</summary><div class="ans">There's no cloud-cost-agent backend and no third-party FinOps database. But be clear-eyed: the output of your <code>aws/gcloud/az</code> commands flows through your agent session into your LLM provider's context — the same trust you already extend to Claude Code or Cursor with your source code. If your org forbids sending infra metadata to an LLM, run a local model or don't use this. We won't pretend otherwise.</div></details>
       <details><summary>What does it actually query?</summary><div class="ans">AWS Cost Explorer, Compute Optimizer and Cost Optimization Hub; GCP Recommender (machine-type, idle, committed-use); Azure Advisor and Cost Management. Some need a one-time opt-in (Compute Optimizer, COH) — the docs cover it.</div></details>
       <details><summary>Does it handle multiple accounts or org-wide spend?</summary><div class="ans">It runs against whatever your CLI profile is authenticated to. There's no centralized multi-account RBAC layer — that's squarely SaaS territory. For per-account or small-team audits it's a fast fit.</div></details>
       <details><summary>Is it really free?</summary><div class="ans">Yes — open source under MIT. The only cost is the providers' own metered APIs (e.g. AWS Cost Explorer bills ~$0.01 per request; the skill is built to avoid loops).</div></details>
