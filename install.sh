@@ -48,7 +48,7 @@ if [[ -f "$SRC/SKILL.md" ]]; then
   cp -r "$SRC/docs/." "$SKILL_DIR/docs/" 2>/dev/null || true
 else
   curl -fsSL "$RAW_BASE/SKILL.md" -o "$SKILL_DIR/SKILL.md"
-  for f in iam-readonly-policy.json gcp-setup.md azure-setup.md; do
+  for f in iam-readonly-policy.json aws-setup.md gcp-setup.md azure-setup.md; do
     curl -fsSL "$RAW_BASE/docs/$f" -o "$SKILL_DIR/docs/$f" 2>/dev/null || true
   done
 fi

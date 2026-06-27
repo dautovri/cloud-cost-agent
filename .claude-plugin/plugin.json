@@ -1,7 +1,7 @@
 {
   "name": "cloud-cost-agent",
   "description": "Native-first FinOps agent for AWS, GCP, and Azure. Finds cloud savings using each provider's own CLIs and recommendation engines (Cost Explorer/Compute Optimizer, GCP Recommender, Azure Advisor).",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": {
     "name": "Ruslan Dautov",
     "url": "https://github.com/dautovri"

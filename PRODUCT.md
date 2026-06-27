@@ -26,11 +26,13 @@ Result: Billions in wasted cloud spend, slow remediation, and agents giving gene
 - Enterprises wanting native + agentic workflows with guardrails.
 
 ## Core Product (Free / Open Core)
-- `SKILL.md` + reference playbooks (rightsizing, idle cleanup, commitments, waste detection, etc.).
+- `SKILL.md` + reference playbooks (rightsizing, idle cleanup, commitments, waste detection, cost anomaly correlation, etc.).
 - One-command install for multiple agents.
 - CLI helper for direct native audits (`cloud-cost-agent audit --provider all`).
 - MCP server for tool-calling agents.
 - GitHub examples for PR-based remediation suggestions.
+- Native Cost Anomaly correlation (matching cost spikes with CloudTrail, GCP Activity Logs, and Azure Activity Logs to pinpoint root cause author and change events).
+- Context-aware mapping configurations (resolving raw cloud account numbers and project IDs to designated Teams and Owners via `finops-context.json`).
 
 ## Paid / Growth Layers
 - Hosted agent or MCP backend.
@@ -41,12 +43,12 @@ Result: Billions in wasted cloud spend, slow remediation, and agents giving gene
 
 ## Competitive Landscape (2026)
 - Dashboards (Vantage, CloudZero, Amnic): Strong visibility, adding agents.
-- Agent tools (Vantage FinOps Agent with GitHub PRs, AWS Bedrock samples): Action-oriented but often tied to one ecosystem or heavy platform.
+- Agent tools (Vantage FinOps Agent with GitHub PRs, AWS FinOps Agent): Action-oriented but often tied to one ecosystem or heavy platform.
 - Our edge: Native purity + portable skills format + multi-cloud focus + zero new login for core workflows.
 
 See competitors:
 - Vantage FinOps Agent (chat + remediation).
-- AWS sample-finops-agent (Bedrock + MCP).
+- AWS FinOps Agent: Launched in public preview (June 2026), bringing natural-language cost queries, anomaly correlation with CloudTrail, and Jira/Slack delivery. This validates our thesis that FinOps is moving from reactive dashboards to active engineering agent workflows. Our core differentiator is that `cloud-cost-agent` is **100% open-source, portable, and multi-cloud (AWS, GCP, and Azure) out of the box** without being locked into any single cloud provider's proprietary SaaS/agent ecosystem.
 - Emerging skills repos (OptimNow, Cletrics).
 
 ## Go-to-Market

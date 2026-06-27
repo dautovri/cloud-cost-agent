@@ -187,7 +187,70 @@ az advisor recommendation list --category Cost \
   --query "[?contains(shortDescription.problem, 'reserved') || contains(shortDescription.problem, 'reservation')]"
 ```
 
-## 6. Prioritization Template (for any provider)
+## 6. Cost Anomaly & Root-Cause Investigation (Advanced)
+
+Investigate sudden spend spikes and attribute them to the exact change event, API call, and resource owner.
+
+### AWS — Cost Anomaly Detection & CloudTrail Correlation
+1. **List active anomaly monitors**:
+   ```bash
+   aws ce get-anomaly-monitors
+   ```
+2. **Retrieve anomalies** detected during a given date window (e.g. minimum impact of $100):
+   ```bash
+   aws ce get-anomalies \
+     --date-interval StartDate=$START,EndDate=$END \
+     --total-impact NumericOperator=GREATER_THAN,StartValue=100.0
+   ```
+3. **Correlate with CloudTrail** to find "who" changed "what" and "when".
+   Using resource IDs or resource types identified in the root causes of the anomaly, run:
+   ```bash
+   aws cloudtrail lookup-events \
+     --lookup-attributes AttributeKey=ResourceName,AttributeValue=YOUR_RESOURCE_ID \
+     --start-time $(date -u -d '3 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-3d +%Y-%m-%dT%H:%M:%SZ) \
+     --query "Events[*].{EventTime:EventTime, EventName:EventName, User:Username, Resources:Resources[*].ResourceName}" \
+     --output json
+   ```
+
+### GCP — Activity logs for sudden resource modifications
+Query GCP Activity Logs to match machine or resource spin-ups with the corresponding IAM user:
+```bash
+gcloud logging read \
+  "resource.type=gce_instance AND protoPayload.methodName=v1.compute.instances.insert" \
+  --project=YOUR_PROJECT \
+  --limit=10 \
+  --format="table(timestamp, protoPayload.authenticationInfo.principalEmail, protoPayload.resourceName)"
+```
+
+### Azure — Activity Log mapping
+Search subscription activity logs for resource creations or scaling operations:
+```bash
+az monitor activity-log list \
+  --offset 3d \
+  --query "[?contains(eventSource.value, 'Administrative') && (contains(operationName.value, 'write') || contains(operationName.value, 'action'))].{Time:eventTimestamp, User:caller, Operation:operationName.localizedValue, Resource:resourceId}" \
+  --output table
+```
+
+## 7. Context-Aware Team & Account Mapping
+
+To translate raw resource IDs and subscription/account numbers into clear human contexts, the agent should search for and load a local context configuration file if it exists (e.g. `finops-context.json` or `.claude-plugin/context.json`).
+
+Example structure for `finops-context.json`:
+```json
+{
+  "accounts": {
+    "123456789012": { "team": "Data Platform", "owner": "Alice", "slack": "#team-data" },
+    "987654321098": { "team": "Frontend Core", "owner": "Bob", "slack": "#team-frontend" }
+  },
+  "tagging-requirements": ["Owner", "Environment", "Project"]
+}
+```
+When this file is present, the agent should:
+- Resolve account and project IDs in reports to their assigned **Team** and **Owner**.
+- Highlight resources that lack the defined `tagging-requirements`.
+- Format remediation updates directly targeting the designated Slack channels or team owners.
+
+## 8. Prioritization Template (for any provider)
 
 When summarizing:
 1. Total estimated monthly / annual savings.
