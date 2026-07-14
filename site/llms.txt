@@ -1,0 +1,28 @@
+# cloud-cost-agent
+
+> Open-source (MIT) AI agent skill that audits cloud spend across AWS, GCP and Azure using each provider's own recommendation engines — AWS Cost Explorer, Compute Optimizer, Cost Optimization Hub, GCP Recommender, and Azure Advisor — from inside the coding agent you already use (Claude Code, Cursor, Codex, Gemini CLI, and 70+ others). No SaaS backend, no data ingestion, no vendor IAM role. Read-only by default; any mutation requires explicit user approval.
+
+Key facts:
+
+- Install (any agent): `npx skills add dautovri/cloud-cost-agent`
+- Install (Claude Code plugin): `/plugin marketplace add dautovri/cloud-cost-agent`
+- Uses your existing CLI auth (`aws`, `gcloud`, `az`) — nothing new to provision.
+- Output is a savings report ranked by estimated $/month and effort, with the exact next command per item.
+- Free. Only costs are the providers' own metered APIs (e.g. AWS Cost Explorer ~$0.01/request).
+- Trust boundary, stated honestly: CLI output flows through your agent session into your LLM provider's context — the same trust you extend to your coding agent with source code. It removes the FinOps vendor from the loop, not the model provider.
+- Not a replacement for continuous-monitoring FinOps SaaS (Vantage, CloudZero): no anomaly alerting, historical baselines, or chargeback. It is an episodic, engineer-driven savings audit.
+
+## Docs
+
+- [SKILL.md](https://github.com/dautovri/cloud-cost-agent/blob/main/skills/cloud-cost-agent/SKILL.md): the skill itself — the full prompt/playbook the agent follows
+- [AWS setup](https://github.com/dautovri/cloud-cost-agent/blob/main/skills/cloud-cost-agent/docs/aws-setup.md): IAM policy and opt-ins (Compute Optimizer, Cost Optimization Hub)
+- [GCP setup](https://github.com/dautovri/cloud-cost-agent/blob/main/skills/cloud-cost-agent/docs/gcp-setup.md): Recommender API enablement and roles
+- [Azure setup](https://github.com/dautovri/cloud-cost-agent/blob/main/skills/cloud-cost-agent/docs/azure-setup.md): Advisor and Cost Management access
+- [README](https://github.com/dautovri/cloud-cost-agent/blob/main/README.md): overview and quick start
+- [PRODUCT.md](https://github.com/dautovri/cloud-cost-agent/blob/main/PRODUCT.md): product vision and positioning
+
+## Links
+
+- [Website](https://dautovri.github.io/cloud-cost-agent/)
+- [GitHub repository](https://github.com/dautovri/cloud-cost-agent)
+- [skills.sh listing](https://skills.sh)

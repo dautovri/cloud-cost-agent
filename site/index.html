@@ -5,8 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>cloud-cost-agent — the FinOps audit without the FinOps platform</title>
 <meta name="description" content="Open-source AI agent skill that finds cloud savings across AWS, GCP and Azure using each provider's own recommendation engines — inside Claude Code, Cursor or Gemini. No dashboard, no data ingestion, free.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Ruslan Dautov">
+<meta name="keywords" content="cloud cost optimization, FinOps, AWS Cost Explorer, GCP Recommender, Azure Advisor, AI agent skill, Claude Code plugin, cloud savings audit, open source FinOps, rightsizing, idle resources">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; font-src 'self' https://fonts.gstatic.com https://cdn.fontshare.com; script-src 'self' 'unsafe-inline'; base-uri 'self'; frame-ancestors 'none'">
 <link rel="canonical" href="https://dautovri.github.io/cloud-cost-agent/">
+<link rel="sitemap" type="application/xml" href="sitemap.xml">
 <link rel="icon" type="image/png" href="assets/favicon-32.png">
 <meta name="theme-color" content="#050505">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,6 +29,90 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dautovri.github.io/cloud-cost-agent/assets/og-card.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://dautovri.github.io/cloud-cost-agent/#software",
+      "name": "cloud-cost-agent",
+      "description": "Open-source AI agent skill that finds cloud savings across AWS, GCP and Azure using each provider's own recommendation engines (Cost Explorer, Compute Optimizer, Cost Optimization Hub, GCP Recommender, Azure Advisor) — inside Claude Code, Cursor, Codex or Gemini CLI. Read-only by default, no data ingestion, no vendor backend.",
+      "url": "https://dautovri.github.io/cloud-cost-agent/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "macOS, Linux, Windows",
+      "softwareRequirements": "An AI coding agent (Claude Code, Cursor, Codex, or Gemini CLI) and the aws, gcloud, or az CLI authenticated to your accounts.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "license": "https://opensource.org/license/mit",
+      "codeRepository": "https://github.com/dautovri/cloud-cost-agent",
+      "author": {
+        "@type": "Person",
+        "name": "Ruslan Dautov",
+        "url": "https://github.com/dautovri"
+      },
+      "keywords": "cloud cost optimization, FinOps, AWS, GCP, Azure, AI agent skill, Claude Code plugin, rightsizing, idle resources, savings audit"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://dautovri.github.io/cloud-cost-agent/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does this replace Vantage or CloudZero?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No — and it doesn't try to. Those platforms provide continuous monitoring, historical data, allocation and finance reporting. This skill does episodic, native, cross-cloud savings audits inside your agent. Different job. If you need ongoing governance with finance stakeholders, keep the SaaS."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it safe to run against production accounts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It's read-only first — audits only call cost/recommendation APIs. Any change (resize, delete, purchase) is quoted back to you and requires explicit approval before it runs. Use the included least-privilege read-only IAM policy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where does my billing data go?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "There's no cloud-cost-agent backend and no third-party FinOps database. But be clear-eyed: the output of your aws/gcloud/az commands flows through your agent session into your LLM provider's context — the same trust you already extend to Claude Code or Cursor with your source code. If your org forbids sending infra metadata to an LLM, run a local model or don't use this."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does it actually query?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AWS Cost Explorer, Compute Optimizer and Cost Optimization Hub; GCP Recommender (machine-type, idle, committed-use); Azure Advisor and Cost Management. Some need a one-time opt-in (Compute Optimizer, COH) — the docs cover it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it handle multiple accounts or org-wide spend?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It runs against whatever your CLI profile is authenticated to. There's no centralized multi-account RBAC layer — that's squarely SaaS territory. For per-account or small-team audits it's a fast fit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — open source under MIT. The only cost is the providers' own metered APIs (e.g. AWS Cost Explorer bills ~$0.01 per request; the skill is built to avoid loops)."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
   :root{
     --bg:#050505; --panel:#0A0B0D; --panel-2:#0E0F12;
