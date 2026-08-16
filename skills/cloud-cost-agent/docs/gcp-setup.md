@@ -11,12 +11,16 @@ gcloud auth application-default login   # for some APIs
 Use the predefined roles (simplest):
 - `roles/recommender.viewer` — read all recommenders
 - `roles/billing.viewer` — billing/CUD read (grant on the billing account for spend-based CUD recommendations)
+- `roles/logging.viewer` — read Activity Logs for anomaly investigation (e.g. tracking instance insertions)
 - BigQuery read on the export dataset if using billing export
 
 If you build a **custom role**, permissions must be spelled out per recommender type — IAM does **not** accept wildcards like `recommender.*.list` in a custom role. For example:
 - `recommender.computeInstanceMachineTypeRecommendations.list` / `.get`
 - `recommender.computeInstanceIdleResourceRecommendations.list` / `.get`
+- `recommender.cloudsqlInstanceIdleRecommendations.list` / `.get`
+- `recommender.cloudsqlInstanceOverprovisionRecommendations.list` / `.get`
 - `recommender.spendBasedCommitmentRecommendations.list` / `.get`
+- `logging.logEntries.list`
 
 ## Billing Export (CUR equivalent)
 1. Go to Billing → Billing export → BigQuery export.

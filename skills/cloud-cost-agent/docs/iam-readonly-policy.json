@@ -70,6 +70,15 @@
         "support:DescribeTrustedAdvisorCheckSummaries"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "CloudTrailAndIdentityRead",
+      "Effect": "Allow",
+      "Action": [
+        "cloudtrail:LookupEvents",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
     }
   ]
 }

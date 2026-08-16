@@ -1,11 +1,13 @@
 # cloud-cost-agent
 
-An open-source AI agent skill that finds cloud savings across AWS, GCP, and Azure — using each provider's own recommendation engines, inside the coding agent you already have open. No FinOps SaaS to onboard, no cross-account IAM roles to grant, no billing data leaving your machine.
+An open-source AI agent skill that finds cloud savings across AWS, GCP, and Azure — using each provider's own recommendation engines, inside the coding agent you already have open. No FinOps SaaS to onboard, no vendor data ingestion, no persistent cross-account IAM roles to grant.
 
-- **Native APIs, not a wrapper.** Queries Cost Explorer, Compute Optimizer, GCP Recommender, and Azure Advisor directly — no third-party cost model, no custom-discount drift.
+- **Native APIs, not a wrapper.** Queries Cost Explorer, Compute Optimizer, Cost Optimization Hub, GCP Recommender, and Azure Advisor directly — no third-party cost model, no custom-discount drift.
 - **Zero setup beyond auth.** Uses your existing `aws`, `gcloud`, `az` CLI credentials. Nothing new to provision.
 - **Read-only by default.** Audits never mutate infrastructure. Any change requires explicit approval.
 - **Ranked output.** Savings sorted by estimated $/month and effort, with the exact next command for each item.
+- **Cost Anomaly & Root-Cause Correlation.** Pinpoints spend spikes and correlates with CloudTrail and Activity Logs to find who changed what.
+- **Context-Aware Team Mapping.** Resolves raw cloud account numbers and project IDs to designated teams and owners via `finops-context.json`.
 - **Works everywhere.** Claude Code, Cursor, Codex, Gemini CLI, and 70+ other agents via [skills.sh](https://skills.sh).
 - **Free.** MIT license. The only cost is the providers' own metered APIs (e.g. AWS Cost Explorer ~$0.01/request).
 
@@ -60,13 +62,13 @@ The skill picks the right native commands per provider and returns a prioritized
 
 | Provider | Native surfaces |
 |----------|-----------------|
-| **AWS** | Cost Explorer, Compute Optimizer, Cost Optimization Hub |
-| **GCP** | Recommender (machine type, idle, CUDs), BigQuery billing export |
-| **Azure** | Advisor (Cost category), Cost Management, Consumption |
+| **AWS** | Cost Explorer, Compute Optimizer, Cost Optimization Hub, Cost Anomaly Detection, CloudTrail |
+| **GCP** | Recommender (machine type, idle, Cloud SQL, CUDs), Cloud Logging, BigQuery billing export |
+| **Azure** | Advisor (Cost category, B-series), Cost Management exports, Activity Logs, Consumption |
 
 ## What it doesn't do
 
-This is an episodic savings audit, not a continuous monitoring platform. No anomaly alerts, no historical trends, no chargeback, no executive dashboards. If you need those, keep Vantage, CloudZero, or similar — they do a different job, well.
+This is an episodic on-demand savings audit, not a continuous monitoring platform. No 24/7 background alerting, no historical trends, no chargeback, no executive dashboards. If you need those, keep Vantage, CloudZero, or similar — they do a different job, well.
 
 ## Links
 

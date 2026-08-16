@@ -9,7 +9,7 @@ az account set --subscription "SUBSCRIPTION_ID_OR_NAME"
 
 ## Required Permissions
 - Reader + Cost Management Reader on the subscription or management group.
-- For Advisor cost recommendations: the built-in `Reader` role usually suffices.
+- For Advisor cost recommendations & Activity Log investigation: the built-in `Reader` role usually suffices (includes `Microsoft.Insights/eventtypes/values/read` for activity logs).
 - For detailed exports/queries: `Cost Management Reader` or `Reader` + storage access if exporting.
 
 Managed roles:

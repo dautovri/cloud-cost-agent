@@ -98,7 +98,11 @@ gcloud recommender recommendations list \
   --recommender=google.cloudbilling.commitment.SpendBasedCommitmentRecommender \
   --billing-account=BILLING_ACCOUNT_ID --location=global --format=json
 ```
-Other cost recommenders: `google.compute.disk.IdleResourceRecommender` (idle disks), `google.compute.address.IdleResourceRecommender` (idle IPs), `google.compute.image.IdleResourceRecommender` (idle images), `google.compute.commitment.UsageCommitmentRecommender` (resource-based CUD).
+Other key cost recommenders:
+- **Disks & IPs:** `google.compute.disk.IdleResourceRecommender` (idle disks, zonal), `google.compute.address.IdleResourceRecommender` (idle IPs, regional)
+- **Cloud SQL:** `google.cloudsql.instance.IdleRecommender` (idle DBs, regional), `google.cloudsql.instance.OverprovisionedRecommender` (overprovisioned DBs, regional)
+- **GKE & Containers:** `google.container.DiagnosisRecommender` (idle GKE clusters, zonal/regional)
+- **Commitments & Images:** `google.compute.commitment.UsageCommitmentRecommender` (resource-based CUD, regional), `google.compute.image.IdleResourceRecommender` (idle images, global).
 
 ### Azure — Advisor Cost category
 ```bash
@@ -157,15 +161,21 @@ Cost Explorer also offers EC2 rightsizing (`--service` is required, only `"Amazo
 aws ce get-rightsizing-recommendation --service "AmazonEC2"
 ```
 
-**GCP** — machine-type recommender (note `tonumber`: GCP returns `cost.units` as a **string**):
+**GCP** — machine-type and Cloud SQL recommenders (note `tonumber`: GCP returns `cost.units` as a **string**):
 ```bash
+# VM rightsizing (zonal)
 gcloud recommender recommendations list \
   --recommender=google.compute.instance.MachineTypeRecommender \
   --project=YOUR_PROJECT --location=us-central1-a --format=json \
   | jq '.[] | select((.primaryImpact.costProjection.cost.units|tonumber) < 0)'
+
+# Cloud SQL instance rightsizing (regional)
+gcloud recommender recommendations list \
+  --recommender=google.cloudsql.instance.OverprovisionedRecommender \
+  --project=YOUR_PROJECT --location=us-central1 --format=json
 ```
 
-**Azure** — Advisor Cost recommendations already include VM rightsizing / underutilized resources (section 2).
+**Azure** — Advisor Cost recommendations already aggregate VM rightsizing, underutilized resources, and burstable (B-series) SKU recommendations (section 2).
 
 ## 5. Commitments & Discounts
 

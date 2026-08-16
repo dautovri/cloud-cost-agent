@@ -8,7 +8,7 @@ aws sts get-caller-identity # confirm the identity/profile you're auditing
 Use a dedicated **read-only `cost-audit` profile**, not an admin profile. Pass `--profile cost-audit` on every command (or set `AWS_PROFILE`).
 
 ## Required Permissions
-Attach the bundled least-privilege policy: [`iam-readonly-policy.json`](./iam-readonly-policy.json). It grants read-only access to Cost Explorer (`ce:*` getters), Compute Optimizer, Cost Optimization Hub, the modern billing actions (`billing:Get*`, `cur:GetUsageReport`), and Trusted Advisor cost checks.
+Attach the bundled least-privilege policy: [`iam-readonly-policy.json`](./iam-readonly-policy.json). It grants read-only access to Cost Explorer (`ce:*` getters and anomalies), Compute Optimizer, Cost Optimization Hub, modern billing actions (`billing:Get*`, `cur:GetUsageReport`), Trusted Advisor cost checks, and CloudTrail event lookups (`cloudtrail:LookupEvents`) for cost anomaly root cause investigation.
 
 Note: the retired `aws-portal:*` actions are intentionally **not** used — AWS replaced them with the fine-grained `billing:`/`ce:`/`cur:` actions in 2023.
 
